@@ -1,15 +1,30 @@
+populateTable();
+
 function populateTable() {
   let books = JSON.parse(localStorage.getItem("booksArr"));
   const table = document.querySelector("table");
+  table.innerHTML = table.innerHTML = `
+  <thead>
+    <tr>
+      <th>Book Name</th>
+      <th>Publish Date</th>
+      <th>Price</th>
+      <th>Author Name</th>
+      <th>Author Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody></tbody>`;
+
   if (books) {
     books.forEach((book) => {
       const tr = document.createElement("tr");
       tr.id = book.id;
-      tr.innerHTML = `<td data-label=name><span>${book.name}</span><input type="text" class="hide"  /></td>
-        <td data-label=publishDate><span>${book.publishDate}</span><input type="date" class="hide"  /></td>
-        <td data-label=price><span>$${book.price}</span><input type="number" class="hide" /></td>
-        <td data-label=authorName><span>${book.author.name}</span><input type="text" class="hide"  /></td>
-        <td data-label=authorEmail><span>${book.author.email}</span><input type="email" class="hide"  /></td>
+      tr.innerHTML = `<td data-label=name><span>${book.name}</span><input type="text" class="hide"/></td>
+        <td data-label=publishDate><span>${book.publishDate}</span><input type="date" class="hide"/></td>
+        <td data-label=price><span>$${book.price}</span><input type="number" class="hide"/></td>
+        <td data-label=authorName><span>${book.author.name}</span><input type="text" class="hide"/></td>
+        <td data-label=authorEmail><span>${book.author.email}</span><input type="email" class="hide"/></td>
         <td class="button-container">
           <button class="edit-button" onclick="edit(event, ${book.id})">Edit</button>
           <button class="delete-button" onclick="Delete(event, ${book.id})">Delete</button>
@@ -22,23 +37,23 @@ function populateTable() {
   }
 }
 
-populateTable();
+function toggleMode(td) {
+  if (td.classList.contains("button-container")) {
+    td.querySelector(".edit-button").classList.toggle("hide");
+    td.querySelector(".delete-button").classList.toggle("hide");
+    td.querySelector(".save-button").classList.toggle("hide");
+    td.querySelector(".cancel-button").classList.toggle("hide");
+  } else {
+    td.querySelector("input").classList.toggle("hide");
+    td.querySelector("span").classList.toggle("hide");
+  }
+}
 
 function cancel(e, id) {
   const tr = document.getElementById(id);
 
   Array.from(tr.children).forEach((td) => {
-    if (td.classList.contains("button-container")) {
-      td.querySelector(".edit-button").classList.remove("hide");
-      td.querySelector(".delete-button").classList.remove("hide");
-      td.querySelector(".save-button").classList.add("hide");
-      td.querySelector(".cancel-button").classList.add("hide");
-    } else {
-      const input = td.querySelector("input");
-      const span = td.querySelector("span");
-      span.classList.remove("hide");
-      input.classList.add("hide");
-    }
+    toggleMode(td);
   });
 }
 function edit(e, id) {
@@ -47,25 +62,19 @@ function edit(e, id) {
   const book = booksArr.find((book) => book.id === id);
 
   Array.from(tr.children).forEach((td) => {
-    if (td.classList.contains("button-container")) {
-      td.querySelector(".edit-button").classList.add("hide");
-      td.querySelector(".delete-button").classList.add("hide");
-      td.querySelector(".save-button").classList.remove("hide");
-      td.querySelector(".cancel-button").classList.remove("hide");
-    } else {
+    toggleMode(td);
+    if (!td.classList.contains("button-container")) {
       const input = td.querySelector("input");
-      const span = td.querySelector("span");
-      input.classList.remove("hide");
       input.focus();
-      if (td.getAttribute("data-label") === "authorName") {
+      const key = td.dataset.label;
+      if (key === "authorName") {
         input.value = book.author.name;
-      } else if (td.getAttribute("data-label") === "authorEmail") {
+      } else if (key === "authorEmail") {
         input.value = book.author.email;
       } else {
-        input.value = book[td.getAttribute("data-label")];
+        console.log(book[key]);
+        input.value = book[key];
       }
-
-      span.classList.add("hide");
     }
   });
 }
@@ -75,26 +84,21 @@ function save(e, id) {
   const booksArr = JSON.parse(localStorage.getItem("booksArr"));
   const book = booksArr.find((book) => book.id === id);
   Array.from(tr.children).forEach((td) => {
-    if (td.classList.contains("button-container")) {
-      td.querySelector(".edit-button").classList.remove("hide");
-      td.querySelector(".delete-button").classList.remove("hide");
-      td.querySelector(".save-button").classList.add("hide");
-      td.querySelector(".cancel-button").classList.add("hide");
-    } else {
-      const input = td.querySelector("input");
+    toggleMode(td);
+    if (!td.classList.contains("button-container")) {
       const span = td.querySelector("span");
-      span.classList.remove("hide");
-      if (td.getAttribute("data-label") === "authorName") {
+      const input = td.querySelector("input");
+      const key = td.dataset.label;
+      if (key === "authorName") {
         book.author.name = input.value;
         span.textContent = book.author.name;
-      } else if (td.getAttribute("data-label") === "authorEmail") {
+      } else if (key === "authorEmail") {
         book.author.email = input.value;
         span.textContent = book.author.email;
       } else {
-        book[td.getAttribute("data-label")] = input.value;
-        span.textContent = book[td.getAttribute("data-label")];
+        book[key] = input.value;
+        span.textContent = book[key];
       }
-      input.classList.add("hide");
     }
   });
   localStorage.setItem("booksArr", JSON.stringify(booksArr));
