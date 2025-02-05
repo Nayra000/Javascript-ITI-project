@@ -1,9 +1,6 @@
 import { Book } from "./classes/bookClass.js";
 import { Author } from "./classes/authorClass.js";
 
-let noBooks = parseInt(location.search.split("=")[1]);
-let booksArr = [];
-
 function bookNameValidate() {
   let bookName = document.getElementById("bookName");
   let span = document.getElementById("bookNameSpan");
@@ -83,6 +80,8 @@ function reset() {
 }
 function addBook(e) {
   e.preventDefault();
+  let noBooks = parseInt(location.search.split("=")[1]) || 0;
+  let booksArr = [];
   let bookName = bookNameValidate();
   let bookPrice = bookPriceValidate();
   let authorName = authorNameValidate();
@@ -96,7 +95,7 @@ function addBook(e) {
     reset();
     noBooks--;
     console.log(noBooks);
-    if (noBooks === 0) {
+    if (noBooks <= 0) {
       localStorage.setItem("booksArr", JSON.stringify(booksArr));
       location.href = "../html/displayBooks.html";
     }

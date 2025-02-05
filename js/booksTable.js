@@ -1,9 +1,9 @@
 populateTable();
 
 function populateTable() {
-  let books = JSON.parse(localStorage.getItem("booksArr"));
+  let books = JSON.parse(localStorage.getItem("booksArr")) || [];
   const table = document.querySelector("table");
-  table.innerHTML = table.innerHTML = `
+  table.innerHTML = `
   <thead>
     <tr>
       <th>Book Name</th>
@@ -16,7 +16,7 @@ function populateTable() {
   </thead>
   <tbody></tbody>`;
 
-  if (books) {
+  if (books.length > 0) {
     books.forEach((book) => {
       const tr = document.createElement("tr");
       tr.id = book.id;
@@ -37,76 +37,87 @@ function populateTable() {
   }
 }
 
-function toggleMode(td) {
-  if (td.classList.contains("button-container")) {
-    td.querySelector(".edit-button").classList.toggle("hide");
-    td.querySelector(".delete-button").classList.toggle("hide");
-    td.querySelector(".save-button").classList.toggle("hide");
-    td.querySelector(".cancel-button").classList.toggle("hide");
-  } else {
-    td.querySelector("input").classList.toggle("hide");
-    td.querySelector("span").classList.toggle("hide");
-  }
+function toggleButtonVisibility(td) {
+  td.querySelector(".edit-button").classList.toggle("hide");
+  td.querySelector(".delete-button").classList.toggle("hide");
+  td.querySelector(".save-button").classList.toggle("hide");
+  td.querySelector(".cancel-button").classList.toggle("hide");
+}
+
+function toggleInputVisibility(td) {
+  td.querySelector("input").classList.toggle("hide");
+  td.querySelector("span").classList.toggle("hide");
 }
 
 function cancel(e, id) {
   const tr = document.getElementById(id);
 
   Array.from(tr.children).forEach((td) => {
-    toggleMode(td);
+    if (!td.classList.contains("button-container")) {
+      toggleInputVisibility(td);
+    } else {
+      toggleButtonVisibility(td);
+    }
   });
 }
 function edit(e, id) {
   const tr = document.getElementById(id);
-  const booksArr = JSON.parse(localStorage.getItem("booksArr"));
+  const booksArr = JSON.parse(localStorage.getItem("booksArr")) || [];
   const book = booksArr.find((book) => book.id === id);
-
-  Array.from(tr.children).forEach((td) => {
-    toggleMode(td);
-    if (!td.classList.contains("button-container")) {
-      const input = td.querySelector("input");
-      input.focus();
-      const key = td.dataset.label;
-      if (key === "authorName") {
-        input.value = book.author.name;
-      } else if (key === "authorEmail") {
-        input.value = book.author.email;
+  if (book) {
+    Array.from(tr.children).forEach((td) => {
+      if (!td.classList.contains("button-container")) {
+        toggleInputVisibility(td);
+        const input = td.querySelector("input");
+        input.focus();
+        const key = td.dataset.label;
+        if (key === "authorName") {
+          input.value = book.author.name;
+        } else if (key === "authorEmail") {
+          input.value = book.author.email;
+        } else {
+          console.log(book[key]);
+          input.value = book[key];
+        }
       } else {
-        console.log(book[key]);
-        input.value = book[key];
+        toggleButtonVisibility(td);
       }
-    }
-  });
+    });
+  }
 }
 
 function save(e, id) {
   const tr = document.getElementById(id);
-  const booksArr = JSON.parse(localStorage.getItem("booksArr"));
+  const booksArr = JSON.parse(localStorage.getItem("booksArr")) || [];
   const book = booksArr.find((book) => book.id === id);
-  Array.from(tr.children).forEach((td) => {
-    toggleMode(td);
-    if (!td.classList.contains("button-container")) {
-      const span = td.querySelector("span");
-      const input = td.querySelector("input");
-      const key = td.dataset.label;
-      if (key === "authorName") {
-        book.author.name = input.value;
-        span.textContent = book.author.name;
-      } else if (key === "authorEmail") {
-        book.author.email = input.value;
-        span.textContent = book.author.email;
+  if (book) {
+    Array.from(tr.children).forEach((td) => {
+      if (!td.classList.contains("button-container")) {
+        toggleInputVisibility(td);
+        const span = td.querySelector("span");
+        const input = td.querySelector("input");
+        const key = td.dataset.label;
+        if (key === "authorName") {
+          book.author.name = input.value;
+          span.textContent = book.author.name;
+        } else if (key === "authorEmail") {
+          book.author.email = input.value;
+          span.textContent = book.author.email;
+        } else {
+          book[key] = input.value;
+          span.textContent = key === "price" ? "$" + input.value : input.value;
+        }
       } else {
-        book[key] = input.value;
-        span.textContent = book[key];
+        toggleButtonVisibility(td);
       }
-    }
-  });
+    });
+  }
   localStorage.setItem("booksArr", JSON.stringify(booksArr));
 }
 
 function Delete(e, id) {
   const tr = document.getElementById(id);
-  let booksArr = JSON.parse(localStorage.getItem("booksArr"));
+  let booksArr = JSON.parse(localStorage.getItem("booksArr")) || [];
   booksArr = booksArr.filter((book) => book.id !== id);
   localStorage.setItem("booksArr", JSON.stringify(booksArr));
   tr.remove();
