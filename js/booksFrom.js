@@ -78,10 +78,12 @@ function reset() {
   document.getElementById("authorName").value = "";
   document.getElementById("authorEmail").value = "";
 }
+
+let booksArr = [];
+let noBooks = parseInt(location.search.split("=")[1]) || 0;
 function addBook(e) {
   e.preventDefault();
-  let noBooks = parseInt(location.search.split("=")[1]) || 0;
-  let booksArr = [];
+
   let bookName = bookNameValidate();
   let bookPrice = bookPriceValidate();
   let authorName = authorNameValidate();
