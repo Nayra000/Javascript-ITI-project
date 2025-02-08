@@ -29,10 +29,12 @@ table {
   background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
-  table-layout: fixed; /* Prevents overflow */
+  table-layout: fixed;
+  /* Prevents overflow */
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -46,7 +48,8 @@ th {
 }
 
 td {
-  max-width: 150px; /* Prevents long text overflow */
+  max-width: 150px;
+  /* Prevents long text overflow */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -55,7 +58,8 @@ td {
 /* Button Container */
 .button-container {
   display: flex;
-  gap: 5px; /* Better spacing */
+  gap: 5px;
+  /* Better spacing */
 }
 
 /* Buttons */
@@ -144,4 +148,15 @@ td {
     max-width: unset;
     white-space: normal;
   }
+}
+
+.validation {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
+
+.removeValidation {
+  display: none;
 }
